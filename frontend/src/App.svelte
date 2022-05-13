@@ -8,7 +8,7 @@
   let Tezos: TezosToolkit;
   let wallet: BeaconWallet;
   const walletOptions = {
-    name: "Illic et Numquam",
+    name: "Illic et Numquam", // change name
     preferredNetwork: NetworkType.HANGZHOUNET
   };
   let userAddress: string;
@@ -33,8 +33,8 @@
     | undefined
     | { imageHash: string; metadataHash: string; opHash: string };
 
+  // finds user's NFTs
   const getUserNfts = async (address: string) => {
-    // finds user's NFTs
     const contract = await Tezos.wallet.at(contractAddress);
     nftStorage = await contract.storage();
     const getTokenIds = await nftStorage.reverse_ledger.get(address);
@@ -100,7 +100,7 @@
       if (response) {
         const data = await response.json();
         if (
-          data.status === true &&
+          data.status === 200 &&
           data.msg.metadataHash &&
           data.msg.imageHash
         ) {
@@ -202,7 +202,9 @@
 
 <main>
   <div class="container">
-    <h1>Illic Et Numquam</h1>
+    <h1>MINT AN NFT</h1>
+
+    <!-- if logged into walled -->
     {#if userAddress}
       <div>
         <div class="user-nfts">
@@ -225,6 +227,8 @@
         <br />
         <button class="roman" on:click={disconnect}>Disconnect</button>
       </div>
+      
+      <!-- if a new nft has been minted -->
       {#if newNft}
         <div>Your NFT has been successfully minted!</div>
         <div>
@@ -259,6 +263,8 @@
             Mint a new NFT
           </button>
         </div>
+      
+      <!-- send picture and metadata to backend -->
       {:else}
         <div>
           <div>Select your picture</div>
@@ -291,9 +297,22 @@
           {/if}
         </div>
       {/if}
+
+     <!-- if wallet not connected -->
     {:else}
-      <div class="roman">Create an NFT with your pictures</div>
+      <div class="roman">Mint Your own NFTs
+        <span>First:</span>
+      </div>
       <button class="roman" on:click={connect}>Connect your wallet</button>
+      <div><ul>
+        <li>
+          Then select your image
+        </li>
+        <li>upload your image</li>
+        <li>watch as your nft is minted</li>
+        <li>(full disclaimer, you can't watch it get minted)</li>
+      </ul>
+    </div>
     {/if}
   </div>
 </main>
