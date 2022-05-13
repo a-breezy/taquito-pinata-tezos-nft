@@ -1,0 +1,19 @@
+{
+  "name": "taquito-pinata-tezos-nft",
+  "version": "1.0.0",
+  "description": "##### This is a tutorial dapp to show how to create NFTs on Tezos with Taquito and Pinata",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-breezy/taquito-pinata-tezos-nft.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a-breezy/taquito-pinata-tezos-nft/issues"
+  },
+  "homepage": "https://github.com/a-breezy/taquito-pinata-tezos-nft#readme"
+}
