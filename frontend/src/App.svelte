@@ -8,8 +8,8 @@
   let Tezos: TezosToolkit;
   let wallet: BeaconWallet;
   const walletOptions = {
-    name: "Illic et Numquam", // change name
-    preferredNetwork: NetworkType.HANGZHOUNET
+    name: "Mint an NFT",
+    preferredNetwork: NetworkType.ITHACANET
   };
   let userAddress: string;
   let files, title, description;
@@ -19,11 +19,12 @@
     description = "this is Uranus";
   }
 
-  const rpcUrl = "https://hangzhounet.api.tez.ie";
+  const rpcUrl = "https://ithacanet.tezos.marigold.dev";
   const serverUrl =
     process.env.NODE_ENV !== "production"
       ? "http://localhost:8080"
-      : "https://my-cool-backend-app.com";
+      : "https://enigmatic-savannah-39244.herokuapp.com/";
+  console.log("being served from " + serverUrl);
   const contractAddress = "KT1VbJAzSAHQMvf5HC9zfEVMPbT2UcBvaMXb";
   let nftStorage = undefined;
   let userNfts: { tokenId: number; ipfsHash: string }[] = [];
@@ -55,16 +56,16 @@
     }
   };
 
+  // connect to user wallet
   const connect = async () => {
     if (!wallet) {
       wallet = new BeaconWallet(walletOptions);
     }
-
     try {
       await wallet.requestPermissions({
         network: {
-          type: NetworkType.HANGZHOUNET,
-          rpcUrl
+          type: NetworkType.ITHACANET,
+          rpcUrl: "https://ithacanet.tezos.marigold.dev"
         }
       });
       userAddress = await wallet.getPKH();
@@ -75,12 +76,14 @@
     }
   };
 
+  // disconnect from user wallet
   const disconnect = () => {
     wallet.client.destroy();
     wallet = undefined;
     userAddress = "";
   };
 
+  // upload nft
   const upload = async () => {
     try {
       pinningMetadata = true;
@@ -88,7 +91,7 @@
       data.append("image", files[0]);
       data.append("title", title);
       data.append("description", description);
-      data.append("creator", userAddress);
+      data.append("creator", userAddress); // userAddress comes from wallet
 
       const response = await fetch(`${serverUrl}/mint`, {
         method: "POST",
@@ -97,20 +100,24 @@
         },
         body: data
       });
+
       if (response) {
         const data = await response.json();
+        console.log(data);
         if (
           data.status === 200 &&
           data.msg.metadataHash &&
           data.msg.imageHash
-        ) {
+          ) {
           pinningMetadata = false;
           mintingToken = true;
           // saves NFT on-chain
+// -->  
+          console.log("error here")
           const contract = await Tezos.wallet.at(contractAddress);
           const op = await contract.methods
-            .mint(char2Bytes("ipfs://" + data.msg.metadataHash), userAddress)
-            .send();
+          .mint(char2Bytes("ipfs://" + data.msg.metadataHash), userAddress)
+          .send();
           console.log("Op hash:", op.opHash);
           await op.confirmation();
 
@@ -204,12 +211,12 @@
   <div class="container">
     <h1>MINT AN NFT</h1>
 
-    <!-- if logged into walled -->
+    <!-- if logged into wallet -->
     {#if userAddress}
       <div>
+        {#if nftStorage}
         <div class="user-nfts">
           Your NFTs:
-          {#if nftStorage}
             [ {#each userNfts.reverse() as nft, index}
               <a
                 href={`https://cloudflare-ipfs.com/ipfs/${nft.ipfsHash}`}
@@ -222,9 +229,9 @@
                 <span>,&nbsp;</span>
               {/if}
             {/each} ]
+          </div>
           {/if}
-        </div>
-        <br />
+          <br />
         <button class="roman" on:click={disconnect}>Disconnect</button>
       </div>
       

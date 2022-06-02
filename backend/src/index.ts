@@ -6,7 +6,7 @@ const multer = require("multer");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
-const port = process.env.NODE_ENV === "production" ? process.env.PORT : 8080; // default port to listen
+const port = process.env.NODE_ENV === "production" ? process.env.PORT : 8080;
 let pinata: any;
 if (process.env.NODE_ENV === "production") {
   pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_SECRET_KEY);
@@ -16,9 +16,10 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const corsOptions = {
-  origin: ["http://localhost:8082", "https://enigmatic-savannah-39244.herokuapp.com/"],
+  origin: ["http://localhost:8082", "https://a-breezy.github.io/taquito-pinata-tezos-nft/"],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
+console.log(corsOptions)
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
 app.use(
@@ -33,7 +34,7 @@ app.get("/", (req, res) => {
 // handles minting
 app.post("/mint", upload.single("image"), async (req, res) => {
   const multerReq = req as any;
-  //console.log(multerReq.file, req.body);
+  console.log(multerReq.file, req.body);
   if (!multerReq.file) {
     res.status(500).json({ status: false, msg: "no file provided" });
   } else {
@@ -90,7 +91,7 @@ app.post("/mint", upload.single("image"), async (req, res) => {
       } else {
         res
           .status(500)
-          .json({ status: false, msg: "metadata were not pinned" });
+          .json({ status: false, msg: "metadata was not pinned" });
       }
     } else {
       res.status(500).json({ status: false, msg: "file was not pinned" });
